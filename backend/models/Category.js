@@ -3,7 +3,8 @@ var Schema = mongoose.Schema;
 
 const categorySchema = new Schema({
     id: mongoose.Schema.Types.ObjectId,
-    name: String
+    pid: {type: String, required: true},
+    name:  {type: String, required: true}
 })
 
 module.exports = mongoose.model("category", categorySchema)

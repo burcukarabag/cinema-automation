@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const citySchema = new mongoose.Schema({
     id: mongoose.Schema.Types.ObjectId,
+    pid: {type: String, required: true},
     zipCode:  {type: String, unique: true},
     name: {type: String, unique: true, required: true}
 })

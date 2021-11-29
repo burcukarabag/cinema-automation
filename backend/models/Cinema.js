@@ -3,8 +3,9 @@ var Schema = mongoose.Schema;
 
 const cinemaSchema = new Schema({
     id: mongoose.Schema.Types.ObjectId,
-    name: String,
-    districtID: {type: Schema.Types.ObjectId, ref: 'district'},
+    pid: {type: String, required: true},
+    name: {type: String, required: true},
+    districtID: {type: Schema.Types.ObjectId, ref: 'district', required: true},
     address: String,
     email: String,
     telephone: String

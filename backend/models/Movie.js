@@ -3,8 +3,9 @@ var Schema = mongoose.Schema;
 
 const filmSchema = new Schema({
     id: mongoose.Schema.Types.ObjectId,
+    pid: {type: String, required: true},
     name: {type: String, required: true},
-    director: String,
+    director:  {type: String, required: true},
     summary: String,
     banner: Binary,
     categoryID: {type: Schema.Types.ObjectId, ref: 'category'},

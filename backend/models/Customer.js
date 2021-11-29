@@ -3,8 +3,9 @@ var Schema = mongoose.Schema;
 
 const customerSchema = new Schema({
     id: mongoose.Schema.Types.ObjectId,
-    name: String,
-    surname: String,
+    pid: {type: String, required: true},
+    name:  {type: String, required: true},
+    surname:  {type: String, required: true},
     identificationNumber: String,
     telephone: String
 })
