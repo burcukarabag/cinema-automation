@@ -1,17 +1,25 @@
 var express = require('express');
-var express = require('express');
-var express = require('express');
 var router = express.Router();
-var City = require("../models/City");
 
-router.get('/', function(req, res, next) {
-    City.find().then((todos) => {
-      res.json(todos);
-    }).catch((err) => {
-      res.json(err);
-    });
-  
-  
+const { check, validationResult, body } = require('express-validator');
+
+var DistrictService = require("../services/DistrictService");
+
+router.get('/', async function (request, response) {
+     let districtList = await DistrictService.getDisctrict();
+     response.json(districtList)
 });
+
+router.delete('/:districtID',
+     async function (request, response) {
+          try {
+               let result = await DistrictService.deleteDistrict({
+                districtID: request.params.districtID
+               });
+               response.send(result)
+          } catch (errors) {
+               return response.status(400).json({ error: errors.toString() });
+          }
+     });
 
 module.exports = router;

@@ -2,6 +2,7 @@ const express = require('express');
 const Mongo = require('./utils/Mongo');
 const app = express()
 
+//import routers
 var cityRouter = require('./routes/CityRouter');
 var disctrictRouter = require('./routes/DistrictRouter');
 var categoryRouter = require('./routes/CategoryRouter');
@@ -13,7 +14,14 @@ var publishRouter = require('./routes/PublishRouter');
 var saloonRouter = require('./routes/SaloonRouter');
 var reservationRouter = require('./routes/ReservationRouter');
  
+//for body parse
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 
+app.use((error, req, res, next) => {
+    return res.status(500).json({ error: error.toString() });
+  });
+  
 app.use('/cities', cityRouter);
 app.use('/districts', disctrictRouter);
 app.use('/categories', categoryRouter);

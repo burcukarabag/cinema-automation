@@ -1,18 +1,18 @@
-const City = require('../models/City')
+const District = require('../models/District')
+const CityService = require('../services/CityService')
 var uuid = require('uuid').v4;
 
-class CityService {
-    static async getCities() {
-        return await City.find();
+class DistrictService {
+    static async getDistrict() {
+        return await District.find();
     }
 
-    static async getCity({pid}) {
-        return await City.collection.findOne({pid: pid})
-    }
+    static async createDistrict({ name, cityID }) {
+        let city = await CityService.getCity({pid: cityID})
+        console.log(city);
 
-    static async createCity({ name, zipCode }) {
         return new Promise((resolve, reject) => {
-            City.collection.insertOne({ name: name, pid: uuid(), zipCode: zipCode}, (error, docs) => {
+            District.collection.insertOne({ name: name, pid: uuid(), city: city._id }, (error, docs) => {
                 if (error) {
                     reject(error)
                 } else {
@@ -37,9 +37,9 @@ class CityService {
         })
     }
 
-    static async deleteCity({cityID }) {
+    static async deleteDistrict({districtID }) {
         return new Promise((resolve, reject) => {
-            City.collection.deleteOne({pid: cityID}, (error) => {
+            District.collection.deleteOne({pid: districtID}, (error) => {
                 if (error) {
                     reject(error)
                 } else {
@@ -50,4 +50,4 @@ class CityService {
     }
 }
 
-module.exports = CityService
+module.exports = DistrictService

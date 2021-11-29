@@ -6,7 +6,7 @@ const reservationSchema = new Schema({
     customerName: String,
     customerUsername: String,
     customerPhone: String,
-    publishId: [type: Schema.Types.ObjectId, ref: 'publish'],
+    publishID: [type: Schema.Types.ObjectId, ref: 'publish'],
     endDate: Date
 })
 
