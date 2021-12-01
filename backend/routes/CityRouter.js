@@ -33,11 +33,9 @@ router.post('/',
           }
      });
 
-router.post('/withList',
+router.post('/create.withList',
      check('cityList')
           .isArray().withMessage('Body must be an array'),
-     check("cityList.*.name")
-          .exists().withMessage("City list must required name field"),
      async function (request, response) {
           const errors = validationResult(request)
           if (!errors.isEmpty()) {
@@ -49,7 +47,6 @@ router.post('/withList',
                     });
                     response.send(result)
                } catch (errors) {
-                    console.log(errors)
                     return response.status(400).json({ error: errors.toString() });
                }
           }
@@ -92,6 +89,26 @@ router.post('/:cityID/districts',
                     let result = await DistrictService.createDistrict({
                          cityID: request.params.cityID,
                          name: request.body.name
+                    });
+                    response.send(result)
+               } catch (errors) {
+                    return response.status(400).json({ error: errors.toString() });
+               }
+          }
+     });
+
+router.post('/:cityID/districts/create.withList',
+     check('districtList')
+          .isArray().withMessage('Body must be an array'),
+     async function (request, response) {
+          const errors = validationResult(request)
+          if (!errors.isEmpty()) {
+               return response.status(422).json(errors.array())
+          } else {
+               try {
+                    let result = await DistrictService.createDistrictWithList({
+                         districtList: request.body.districtList,
+                         cityID: request.params.cityID
                     });
                     response.send(result)
                } catch (errors) {

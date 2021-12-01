@@ -3,16 +3,21 @@ const CityService = require('../services/CityService')
 var uuid = require('uuid').v4;
 
 class DistrictService {
-    static async getDistrict() {
-        return await District.find();
+    
+    static async getDistrict({pid}) {
+        let district = await District.findOne({pid: pid});
+        if(district){
+            return district
+        }else{
+            throw new Error("City not found")
+        }
     }
 
     static async createDistrict({ name, cityID }) {
         let city = await CityService.getCity({pid: cityID})
-        console.log(city);
 
         return new Promise((resolve, reject) => {
-            District.collection.insertOne({ name: name, pid: uuid(), city: city._id }, (error, docs) => {
+            District.collection.insertOne({ name: name, pid: uuid(), cityID: city._id }, (error, docs) => {
                 if (error) {
                     reject(error)
                 } else {
@@ -21,20 +26,6 @@ class DistrictService {
             })
         })
 
-    }
-
-    static async createCityWithList({ cityList }) {
-        cityList = cityList.map(city=> ({ ...city, pid: uuid() }))
-
-        return new Promise((resolve, reject) => {
-            City.collection.insertMany(cityList, (error) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve("Successfully created!")
-                }
-            })
-        })
     }
 
     static async deleteDistrict({districtID }) {
@@ -48,6 +39,24 @@ class DistrictService {
             })
         })
     }
+
+
+    static async createDistrictWithList({ districtList, cityID }) {
+        let city = await CityService.getCity({pid: cityID})
+        districtList = districtList.map(district=> ({ name: district, pid: uuid(), cityID: city._id}))
+
+
+        return new Promise((resolve, reject) => {
+            District.collection.insertMany(districtList, (error) => {
+                if (error) {
+                    reject(error)
+                } else {
+                    resolve("Successfully created!")
+                }
+            })
+        })
+    }
+
 }
 
 module.exports = DistrictService

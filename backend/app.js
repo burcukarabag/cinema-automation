@@ -13,7 +13,7 @@ var customerRouter = require('./routes/CustomerRouter');
 var publishRouter = require('./routes/PublishRouter');
 var saloonRouter = require('./routes/SaloonRouter');
 var reservationRouter = require('./routes/ReservationRouter');
- 
+
 //for body parse
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -26,15 +26,16 @@ app.use('/cities', cityRouter);
 app.use('/districts', disctrictRouter);
 app.use('/categories', categoryRouter);
 app.use('/cinemas', cinemaRouter);
-app.use('/films', filmRouter);
+app.use('/movies', filmRouter);
 app.use('/chairs', chairRouter);
 app.use('/customers', customerRouter);
-app.use('/publishes', publishRouter);
+app.use('/sessions', publishRouter);
 app.use('/saloons', saloonRouter);
 app.use('/reservations', reservationRouter);
 
 Mongo.connect().then(()=>{
     app.listen(3000, ()=>{
         console.log("Server up and running")
+  
     })
 })

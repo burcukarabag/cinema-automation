@@ -7,7 +7,12 @@ class CityService {
     }
 
     static async getCity({pid}) {
-        return await City.collection.findOne({pid: pid})
+        let city = await City.collection.findOne({pid: pid})
+        if(city){
+            return city
+        }else{
+            throw new Error("Not found")
+        }
     }
 
     static async createCity({ name, zipCode }) {
@@ -24,7 +29,7 @@ class CityService {
     }
 
     static async createCityWithList({ cityList }) {
-        cityList = cityList.map(city=> ({ ...city, pid: uuid() }))
+        cityList = cityList.map(city=> ({ name: city, pid: uuid(), zipCode: null}))
 
         return new Promise((resolve, reject) => {
             City.collection.insertMany(cityList, (error) => {
