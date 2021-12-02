@@ -6,6 +6,6 @@ const chairReservedSchema = new Schema({
     pid: {type: String, required: true},
     reservationID: {type: Schema.Types.ObjectId, ref: 'reservation', required: true},
     chairID: {type: Schema.Types.ObjectId, ref: 'chair', required: true},
-})
+});
 
 module.exports = mongoose.model("chairReserved", chairReservedSchema)

@@ -6,7 +6,7 @@ const chairSchema = new Schema({
     pid: {type: String, required: true},
     number: {type: Number, required: 'true'},
     status:  {type: Boolean, required: true},
-    saloonID: {type: Schema.Types.ObjectId, ref: 'saloon', required: true}
+    sessionID: {type: Schema.Types.ObjectId, ref: 'session', required: true}
 })
 
 module.exports = mongoose.model("chair", chairSchema)
