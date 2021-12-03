@@ -2,14 +2,18 @@ const Cinema = require('../models/Cinema')
 const District = require('../models/District')
 const DistrictService = require('../services/DistrictService')
 const CityService = require('../services/CityService')
+const {
+    ObjectId
+} = require('mongodb');
+
 var uuid = require('uuid').v4;
 
 class CinemaService {
 
     static async getCinemaList() {
-        try{
+        try {
             return await Cinema.find();
-        }catch(error) {
+        } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
@@ -20,13 +24,15 @@ class CinemaService {
         }
     }
 
-    static async getCinema({pid, name, districtID, throwError=true}) {
-        let cinema = await Cinema.findOne({ ...(!!pid && {pid: pid}),
-            ...(!!name && {name: name}), ...(!!districtID && {districtID: districtID})});
+    static async getCinema({pid, name, districtID, throwError = true}) {
+        let cinema = await Cinema.findOne({
+            ...(!!pid && {pid: pid}),
+            ...(!!name && {name: name}), ...(!!districtID && {districtID: districtID})
+        });
         if (cinema) {
             return cinema
         } else {
-            if(throwError){
+            if (throwError) {
                 throw new NotFoundError({
                     detail: "Cinema not found",
                     detailKey: "errors.notFound.cinema",
@@ -34,7 +40,7 @@ class CinemaService {
                         cinemaID: pid
                     }
                 })
-            }else{
+            } else {
                 return null
             }
         }
@@ -43,11 +49,18 @@ class CinemaService {
     static async createCinema({name, districtID, address, email, telephone}) {
         let district = await DistrictService.getDistrict({pid: districtID});
         let cinema = await this.getCinema({name: name, districtID: district._id, throwError: false});
-        if(!cinema){
-            try{
-                await Cinema.collection.insertOne({ name: name, pid: uuid(), districtID: district._id, address: address, email: email, telephone: telephone});
+        if (!cinema) {
+            try {
+                await Cinema.collection.insertOne({
+                    name: name,
+                    pid: uuid(),
+                    districtID: district._id,
+                    address: address,
+                    email: email,
+                    telephone: telephone
+                });
                 return new SuccessMessage({name: "Cinema", message: "Successfully created"})
-            }catch(error) {
+            } catch (error) {
                 throw new BusinessError({
                     detail: "An expected error during this operation",
                     detailKey: "errors.businessError",
@@ -58,7 +71,7 @@ class CinemaService {
                     }
                 })
             }
-        }else{
+        } else {
             throw new ValidationError({
                 detail: "This cinema name already exist in this district",
                 detailKey: "errors.alreadyExist.cinema",
@@ -72,10 +85,10 @@ class CinemaService {
 
     static async deleteCinema({cinemaID}) {
         let cinema = await this.getCinemaList({pid: cinemaID});
-        try{
+        try {
             await Cinema.collection.deleteOne({id: cinema._id});
             return new SuccessMessage({name: "Cinema", message: "Successfully deleted", id: cinema._id})
-        }catch(error) {
+        } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
@@ -90,9 +103,23 @@ class CinemaService {
     static async getCityCinemaList({cityID}) {
         let city = await CityService.getCity({pid: cityID});
 
-        try{
-            // return await Cinema.find()
-        }catch(error) {
+        try {
+            return await Cinema.aggregate([
+                {
+                    '$lookup': {
+                        'from': 'districts',
+                        'localField': 'districtID',
+                        'foreignField': '_id',
+                        'as': 'districts'
+                    }
+                }, {
+                    '$match': {
+                        'districts.cityID': city._id
+                    }
+                }
+            ])
+        } catch (error) {
+            console.log(error);
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
@@ -106,9 +133,9 @@ class CinemaService {
     static async getDistrictCinemaList({districtID}) {
         let district = await DistrictService.getDistrict({pid: districtID});
 
-        try{
+        try {
             return await Cinema.find({districtID: district._id});
-        }catch(error) {
+        } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
