@@ -3,12 +3,9 @@ var router = express.Router();
 
 const {check, validationResult, body} = require('express-validator');
 
-var DistrictService = require("../services/DistrictService");
-var CinemaService = require("../services/CinemaService");
-
 router.get('/', async function (request, response) {
-    let districtList = await DistrictService.getDistrictList();
-    response.json(districtList)
+    let result = await DistrictService.getDistrictList();
+    response.json(result)
 });
 
 router.get('/:districtID', async function (request, response) {

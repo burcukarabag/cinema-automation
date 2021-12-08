@@ -1,11 +1,11 @@
-const Cinema = require('../models/Cinema')
+const Category = require('../models/Category');
 var uuid = require('uuid').v4;
 
-class CinemaService {
+class CategoryService {
 
-    static async getCinemaList() {
+    static async getCategoryList() {
         try {
-            return await Cinema.find();
+            return await Category.find();
         } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
@@ -17,76 +17,71 @@ class CinemaService {
         }
     }
 
-    static async getCinema({pid, name, districtID, throwError = true}) {
-        let cinema = await Cinema.findOne({
+    static async getCategory({pid, name, throwError=true}) {
+        let category = await Category.findOne({
             ...(!!pid && {pid: pid}),
-            ...(!!name && {name: name}), ...(!!districtID && {districtID: districtID})
+            ...(!!name && {name: name})
         });
-        if (cinema) {
-            return cinema
+        if (category) {
+            return category
         } else {
-            if (throwError) {
+            if(throwError){
                 throw new NotFoundError({
-                    detail: "Cinema not found",
-                    detailKey: "errors.notFound.cinema",
+                    detail: "Category not found",
+                    detailKey: "errors.notFound.category",
                     metadata: {
-                        cinemaID: pid
+                        categoryID: pid
                     }
                 })
-            } else {
+            }else{
                 return null
             }
         }
     }
 
-    static async createCinema({name, districtID, address, email, telephone}) {
-        let district = await DistrictService.getDistrict({pid: districtID});
-        let cinema = await this.getCinema({name: name, districtID: district._id, throwError: false});
-        if (!cinema) {
+    static async createCategory({name}) {
+        let category = await this.getCategory({name: name, throwError: false});
+        if(!category){
             try {
-                await Cinema.collection.insertOne({
+                await Category.collection.insertOne({
                     name: name,
-                    pid: uuid(),
-                    districtID: district._id,
-                    address: address,
-                    email: email,
-                    telephone: telephone
+                    pid: uuid()
                 });
                 return new SuccessMessage({name: name, message: "Successfully created"})
             } catch (error) {
+                console.log(error)
                 throw new BusinessError({
                     detail: "An expected error during this operation",
                     detailKey: "errors.businessError",
                     metadata: {
-                        cinemaName: name,
-                        districtID: districtID,
+                        categoryName: name,
                         error: error
                     }
                 })
             }
-        } else {
+        }else{
             throw new ValidationError({
-                detail: "This cinema name already exist in this district",
-                detailKey: "errors.alreadyExist.cinema",
+                detail: "This category name already exist",
+                detailKey: "errors.alreadyExist.category",
                 metadata: {
-                    districtID: districtID,
                     name: name
                 }
             })
         }
+
     }
 
-    static async deleteCinema({cinemaID}) {
-        let cinema = await this.getCinema({pid: cinemaID});
+    static async deleteCategory({categoryID}) {
+        let category = await this.getCategory({pid: categoryID});
         try {
-            await Cinema.collection.deleteOne({id: cinema._id});
-            return new SuccessMessage({name: cinema.name, message: "Successfully deleted", pid: cinema.pid})
+            await Category.collection.deleteOne({id: category._id});
+            return new SuccessMessage({name: category.name, message: "Successfully deleted", pid: category.pid})
         } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
                 metadata: {
-                    cinemaID: cinemaID,
+                    categoryID: categoryID,
                     error: error
                 }
             })
@@ -140,4 +135,4 @@ class CinemaService {
 
 }
 
-module.exports = CinemaService
+module.exports = CategoryService;

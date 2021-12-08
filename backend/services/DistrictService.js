@@ -1,13 +1,12 @@
 const District = require('../models/District')
-const CityService = require('../services/CityService')
 var uuid = require('uuid').v4;
 
 class DistrictService {
 
     static async getDistrictList() {
-        try{
+        try {
             return await District.find();
-        }catch(error) {
+        } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
@@ -17,49 +16,72 @@ class DistrictService {
             })
         }
     }
-    
-    static async getDistrict({pid}) {
 
-        let district = await District.collection.findOne({pid: pid});
+    static async getDistrict({pid, name, cityID, throwError = true}) {
+
+        let district = await District.collection.findOne(
+            {
+                ...(!!pid && {pid: pid}),
+                ...(!!name && {name: name}),
+                ...(!!cityID && {cityID: cityID})
+            });
         if (district) {
             return district
         } else {
-            throw new NotFoundError({
-                detail: "District not found",
-                detailKey: "errors.notFound.district",
-                metadata: {
-                    districtID: pid
-                }
-            })
+            if (throwError) {
+                throw new NotFoundError({
+                    detail: "District not found",
+                    detailKey: "errors.notFound.district",
+                    metadata: {
+                        districtID: pid
+                    }
+                })
+            } else {
+                return null
+            }
+
         }
     }
 
     static async createDistrict({name, cityID}) {
         let city = await CityService.getCity({pid: cityID});
 
-        try{
-            await District.collection.insertOne({name: name, pid: uuid(), cityID: city._id});
-            return new SuccessMessage({name: "District", message: "Successfully created"})
-        }catch(error) {
-            throw new BusinessError({
-                detail: "An expected error during this operation",
-                detailKey: "errors.businessError",
+        let district = await this.getDistrict({name: name, cityID: city._id, throwError: false});
+        if (!district) {
+            try {
+                await District.collection.insertOne({name: name, pid: uuid(), cityID: city._id});
+                return new SuccessMessage({name: name, message: "Successfully created"})
+            } catch (error) {
+                throw new BusinessError({
+                    detail: "An expected error during this operation",
+                    detailKey: "errors.businessError",
+                    metadata: {
+                        districtName: name,
+                        cityID: city.pid,
+                        error: error
+                    }
+                })
+            }
+        } else {
+            throw new ValidationError({
+                detail: "This district name already exist in this city",
+                detailKey: "errors.alreadyExist.district",
                 metadata: {
-                    districtName: name,
                     cityID: cityID,
-                    error: error
+                    name: name
                 }
             })
         }
+
     }
 
     static async deleteDistrict({districtID}) {
 
         let district = await this.getDistrict({pid: districtID});
-        try{
+        try {
             await District.collection.deleteOne({id: district._id});
-            return new SuccessMessage({name: "District", message: "Successfully deleted", id: district._id})
-        }catch(error) {
+            return new SuccessMessage({name: district.name, message: "Successfully deleted", pid: district.pid})
+        } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
@@ -71,14 +93,38 @@ class DistrictService {
         }
     }
 
-    static async createDistrictWithList({ districtList, cityID }) {
-        let city = await CityService.getCity({pid: cityID});
-        districtList = districtList.map(district=> ({ name: district, pid: uuid(), cityID: city._id}));
+    static async deleteManyDistrict({cityID}) {
+        try {
+            await District.collection.deleteMany({cityID: cityID});
+            return new SuccessMessage({name: "Districts", message: "Successfully deleted", pid: cityID})
+        } catch (error) {
+            throw new BusinessError({
+                detail: "An expected error during this operation",
+                detailKey: "errors.businessError",
+                metadata: {
+                    cityID: cityID,
+                    error: error
+                }
+            })
+        }
+    }
 
-        try{
-            await District.collection.insertMany(districtList);
+    static async createDistrictWithList({districtNameList, cityID}) {
+        let city = await CityService.getCity({pid: cityID});
+        let districtList = districtNameList.map(district => ({name: district, pid: uuid(), cityID: city._id}));
+        await this.isDistrictExist({cityID: city.pid, districtNameList: districtNameList});
+        let session = await District.startSession();
+        session.startTransaction();
+        const opts = {session};
+        try {
+            await District.collection.insertMany(districtList, opts);
+            await session.commitTransaction();
+            session.endSession();
             return new SuccessMessage({name: "District List", message: "Successfully created"})
-        }catch(error) {
+        } catch (error) {
+            console.log(error)
+            await session.abortTransaction();
+            session.endSession();
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",
@@ -90,12 +136,39 @@ class DistrictService {
         }
     }
 
+    static async isDistrictExist({districtNameList, cityID}) {
+
+        try {
+            let districtList = await District.find({name: {$in: districtNameList}})
+            if(districtList.length>0){
+                throw new ValidationError({
+                    detail: "District name already exist in this city",
+                    detailKey: "errors.alreadyExist.district",
+                    metadata: {
+                        cityID: cityID,
+                        districtNameList: districtNameList
+                    }
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            throw new BusinessError({
+                detail: "An expected error during this operation",
+                detailKey: "errors.businessError",
+                metadata: {
+                    districtNameList: districtNameList,
+                    error: error
+                }
+            })
+        }
+    }
+
     static async getCityDistrictList({cityID}) {
         let city = await CityService.getCity({pid: cityID});
 
-        try{
+        try {
             return await District.find({cityID: city._id});
-        }catch(error) {
+        } catch (error) {
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",

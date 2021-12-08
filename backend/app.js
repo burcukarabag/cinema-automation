@@ -3,13 +3,14 @@ const Mongo = require('./utils/Mongo');
 const app = express();
 require("./utils/ErrorHandler");
 require("./utils/SuccessMessageHandler");
+require("./services");
 
 //import routers
 const cityRouter = require('./routes/CityRouter');
 const districtRouter = require('./routes/DistrictRouter');
 const categoryRouter = require('./routes/CategoryRouter');
 const cinemaRouter = require('./routes/CinemaRouter');
-const filmRouter = require('./routes/FilmRouter');
+const movieRouter = require('./routes/MovieRouter');
 const chairRouter = require('./routes/ChairRouter');
 const customerRouter = require('./routes/CustomerRouter');
 const publishRouter = require('./routes/PublishRouter');
@@ -24,7 +25,7 @@ app.use('/cities', cityRouter);
 app.use('/districts', districtRouter);
 app.use('/categories', categoryRouter);
 app.use('/cinemas', cinemaRouter);
-app.use('/movies', filmRouter);
+app.use('/movies', movieRouter);
 app.use('/chairs', chairRouter);
 app.use('/customers', customerRouter);
 app.use('/sessions', publishRouter);
@@ -33,7 +34,6 @@ app.use('/reservations', reservationRouter);
 
 Mongo.connect().then(()=>{
     app.listen(3000, ()=>{
-        console.log("Server up and running")
-  
+        console.log("Server up and running");
     })
-})
+});

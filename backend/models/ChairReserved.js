@@ -8,4 +8,4 @@ const chairReservedSchema = new Schema({
     chairID: {type: Schema.Types.ObjectId, ref: 'chair', required: true},
 });
 
-module.exports = mongoose.model("chairReserved", chairReservedSchema)
+module.exports = mongoose.model("chairReserved", chairReservedSchema);

@@ -3,13 +3,9 @@ const router = express.Router();
 
 const {check, validationResult, body} = require('express-validator');
 
-const CityService = require("../services/CityService");
-const DistrictService = require("../services/DistrictService");
-const CinemaService = require("../services/CinemaService");
-
 router.get('/', async function (request, response) {
-    let cityList = await CityService.getCityList();
-    response.json(cityList)
+    let result = await CityService.getCityList();
+    response.json(result)
 });
 
 router.get('/:cityID', async function (request, response) {
@@ -56,7 +52,7 @@ router.post('/create.withList',
                     cityList: request.body.cityList
                 });
                 response.send(result)
-            } catch (errors) {
+            } catch (error) {
                 response.status(error.statusCode).json(error)
             }
         }
@@ -117,7 +113,7 @@ router.post('/:cityID/districts/create.withList',
         } else {
             try {
                 let result = await DistrictService.createDistrictWithList({
-                    districtList: request.body.districtList,
+                    districtNameList: request.body.districtList,
                     cityID: request.params.cityID
                 });
                 response.send(result)

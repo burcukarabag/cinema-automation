@@ -2,13 +2,13 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', async function (request, response) {
-    let result = await CinemaService.getCinemaList();
+    let result = await MovieService.getMovieList();
     response.json(result)
 });
 
-router.get('/:cinemaID', async function (request, response) {
+router.get('/:movieID', async function (request, response) {
     try {
-        let result = await CinemaService.getCinema({pid: request.params.cinemaID});
+        let result = await MovieService.getMovie({pid: request.params.movieID});
         response.send(result)
     } catch (error) {
         response.status(error.statusCode).json(error)
@@ -16,11 +16,11 @@ router.get('/:cinemaID', async function (request, response) {
 
 });
 
-router.delete('/:cinemaID',
+router.delete('/:movieID',
     async function (request, response) {
         try {
-            let result = await CinemaService.deleteCinema({
-                cinemaID: request.params.cinemaID
+            let result = await MovieService.deleteMovie({
+                movieID: request.params.movieID
             });
             response.send(result)
         } catch (error) {
