@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 const categorySchema = new Schema({
     id: mongoose.Schema.Types.ObjectId,
-    pid: {type: String, required: true},
+    pid: {type: String, unique: true, required: true},
     name:  {type: String, unique: true, required: true}
 });
 

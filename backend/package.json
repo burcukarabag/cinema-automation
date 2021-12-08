@@ -11,7 +11,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-validator": "^6.13.0",
-    "mongoose": "^6.0.14",
+    "mongoose": "^5.13.13",
     "uuid": "^8.3.2"
   }
 }

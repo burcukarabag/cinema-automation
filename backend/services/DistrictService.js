@@ -79,7 +79,7 @@ class DistrictService {
 
         let district = await this.getDistrict({pid: districtID});
         try {
-            await District.collection.deleteOne({id: district._id});
+            await District.deleteOne({_id: district._id});
             return new SuccessMessage({name: district.name, message: "Successfully deleted", pid: district.pid})
         } catch (error) {
             throw new BusinessError({
@@ -113,18 +113,18 @@ class DistrictService {
         let city = await CityService.getCity({pid: cityID});
         let districtList = districtNameList.map(district => ({name: district, pid: uuid(), cityID: city._id}));
         await this.isDistrictExist({cityID: city.pid, districtNameList: districtNameList});
-        let session = await District.startSession();
-        session.startTransaction();
-        const opts = {session};
+        // let session = await District.startSession();
+        // session.startTransaction();
+        // const opts = {session};
         try {
-            await District.collection.insertMany(districtList, opts);
-            await session.commitTransaction();
-            session.endSession();
+            await District.collection.insertMany(districtList,);
+            // await session.commitTransaction();
+            // session.endSession();
             return new SuccessMessage({name: "District List", message: "Successfully created"})
         } catch (error) {
             console.log(error)
-            await session.abortTransaction();
-            session.endSession();
+            // await session.abortTransaction();
+            // session.endSession();
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",

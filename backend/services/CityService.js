@@ -50,17 +50,17 @@ class CityService {
     static async createCityWithList({cityList}) {
         cityList = cityList.map(city => ({name: city, pid: uuid(), zipCode: null}))
         let session = await City.startSession();
-        session.startTransaction();
-        const opts = {session};
+        // session.startTransaction();
+        // const opts = {session};
         try {
-            await City.collection.insertMany(cityList, opts);
-            await session.commitTransaction();
-            session.endSession();
+            await City.collection.insertMany(cityList);
+            // await session.commitTransaction();
+            // session.endSession();
             return new SuccessMessage({name: "City List", message: "Successfully created"})
         } catch (error) {
             console.log(error)
-            await session.abortTransaction();
-            session.endSession();
+            // await session.abortTransaction();
+            // session.endSession();
             throw new BusinessError({
                 detail: "An expected error during this operation",
                 detailKey: "errors.businessError",

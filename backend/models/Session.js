@@ -8,6 +8,6 @@ const sessionSchema = new Schema({
     saloonID: {type: Schema.Types.ObjectId, ref: 'saloon', required: true},
     startDate:  {type: Date, required: true},
     endDate:  {type: Date, required: true}
-})
+});
 
-module.exports = mongoose.model("session", sessionSchema)
+module.exports = mongoose.model("session", sessionSchema);

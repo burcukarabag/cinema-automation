@@ -78,7 +78,7 @@ class MovieService {
     static async deleteMovie({movieID}) {
         let movie = await this.getMovie({pid: movieID});
         try {
-            await Movie.collection.deleteOne({id: movie._id});
+            await Movie.deleteOne({_id: movie._id});
             return new SuccessMessage({name: movie.name, message: "Successfully deleted", pid: movie.pid})
         } catch (error) {
             throw new BusinessError({

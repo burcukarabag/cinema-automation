@@ -74,7 +74,7 @@ class CategoryService {
     static async deleteCategory({categoryID}) {
         let category = await this.getCategory({pid: categoryID});
         try {
-            await Category.collection.deleteOne({id: category._id});
+            await Category.deleteOne({_id: category._id});
             return new SuccessMessage({name: category.name, message: "Successfully deleted", pid: category.pid})
         } catch (error) {
             throw new BusinessError({

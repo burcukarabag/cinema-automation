@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 const movieSchema = new Schema({
     id: mongoose.Schema.Types.ObjectId,
-    pid: {type: String, required: true},
+    pid: {type: String, unique: true, required: true},
     name: {type: String, required: true},
     director:  {type: String, required: true},
     summary: {type: String },

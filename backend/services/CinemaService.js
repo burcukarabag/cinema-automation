@@ -79,7 +79,7 @@ class CinemaService {
     static async deleteCinema({cinemaID}) {
         let cinema = await this.getCinema({pid: cinemaID});
         try {
-            await Cinema.collection.deleteOne({id: cinema._id});
+            await Cinema.deleteOne({_id: cinema._id});
             return new SuccessMessage({name: cinema.name, message: "Successfully deleted", pid: cinema.pid})
         } catch (error) {
             throw new BusinessError({
